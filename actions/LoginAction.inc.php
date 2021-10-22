@@ -1,4 +1,4 @@
-<?
+<?php
 
 require_once("models/Model.inc.php");
 require_once("actions/Action.inc.php");
@@ -16,7 +16,22 @@ class LoginAction extends Action {
 	 * @see Action::run()
 	 */
 	public function run() {
-		/* TODO  */
+	    $nickname = $_POST['nickname'];
+	    $password = $_POST['password'];
+	    
+	    $model = new Model();
+	    
+	    if($this->database->checkPassword($nickname,$password)) { //Succès
+	        $this->setSessionLogin($nickname);
+	        $model->setLogin($nickname);
+	    } else {   //Echec
+	        $model->setLoginError("erreur");
+	    }
+	    
+        $this->setModel($model);
+        
+        $view = getViewByName('Default');
+        $this->setView($view);
 	}
 
 }
