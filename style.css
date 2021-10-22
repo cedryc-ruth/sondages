@@ -1,0 +1,259 @@
+body {
+	margin-top:20px;
+}
+
+.header {
+	position: relative;
+	border: 1px solid #BBB;
+	width: 800px;
+	height: 120px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.title {
+	position: absolute;
+	bottom: 30px;
+	left: 30px;
+	font-size: 30pt;
+	color: #300;
+}
+
+.loginForm {
+	position: absolute;
+	text-align:right;
+	bottom: 10px;
+	right: 10px;
+	font-size: 12pt;
+	color: #000000;
+}
+
+.loginForm form {
+	position: relative;
+	bottom: 10px;
+	right: 10px;
+	font-size: 12pt;
+	color: #000000;
+}
+
+.loginForm .label {
+	display:inline-block;
+	width:90px;
+	font-size: 10pt;
+}
+
+.loginForm .field {
+	font-size: 10pt;
+	font-family: Lucida Grande, sans-serif;
+	border: 1px solid #BBB;
+	margin-bottom: 3px;
+	margin-left: 5px;
+}
+
+.loginForm .submit {
+	font-size: 10pt;
+	font-family: Lucida Grande, sans-serif;
+	border: 1px solid #AAA;
+	background-color: #FFE;
+	cursor:pointer;
+}
+
+.loginForm .nickname {
+	font-size: 13pt;
+	font-family: Lucida Grande, sans-serif;
+	color: #777;
+	margin-bottom: 10px;
+}
+
+.loginForm .error {
+	display:inline;
+	font-size: 11pt;
+	color:#440000;
+	font-family: Lucida Grande, sans-serif;
+	margin-bottom: 10px;
+}
+
+.content {
+	text-align:center;
+	border: 1px solid #BBB;
+	border-top: none;
+	width: 800px;
+	margin-left: auto;
+	margin-right: auto;
+	padding-top:20px;
+	padding-bottom:20px;
+}
+
+.commands {
+	position: relative;
+    width: 800px;
+	height: 20px;
+	margin-left: auto;
+	margin-right: auto;
+	text-align:center;	
+}
+
+.commands  a {
+	color: #300;
+	padding: 5px;
+	margin: 0 1px;
+	text-decoration: none;
+}
+
+.searchForm {
+	position: relative;
+	border: 1px solid #BBB;
+	border-bottom: 1px dashed #BBB;
+	width: 800px;
+	height: 150px;
+	margin-left: auto;
+	margin-right: auto;
+	padding-top:20px;
+	text-align:center;	
+	font-family: Lucida Grande, sans-serif;
+	font-size: 14pt;
+}
+
+.searchForm .field {
+	font-family: Lucida Grande, sans-serif;
+	font-size: 14pt;
+	border: 1px solid #BBB;
+}
+
+.searchForm .submit {
+	font-family: Lucida Grande, sans-serif;
+	font-size: 14pt;
+	border: 1px solid #AAA;
+	cursor:pointer;
+	background-color: #FFE;
+}
+
+.searchForm .message {
+	font-family: Lucida Grande, sans-serif;
+	font-size: 12pt;
+}
+
+.searchForm .message a {
+	color: #440000;
+	text-decoration: none;
+}
+
+.footbar {
+	width: 800px;
+	text-align:center;
+	margin-left: auto;
+	margin-right: auto;	
+	font-family: Lucida Grande, sans-serif;
+	font-size: 8pt;
+	padding-top:4px;
+	color:#300;
+}
+
+.content .form {
+	display:inline-block;
+	width:400px;
+	text-align:right;
+	padding-top:30px;
+	padding-bottom:30px;
+}
+
+.content .form .field {
+	display:inline-block;
+	font-family: Lucida Grande, sans-serif;
+	font-size: 12pt;
+	border: 1px solid #BBB;
+	margin-bottom:8px;
+	width:200px;
+}
+
+.content .form .fixed {
+	border: 1px solid #FFF;
+}
+
+.content .form .submit {
+	font-family: Lucida Grande, sans-serif;
+	font-size: 12pt;
+	border: 1px solid #AAA;
+	margin-bottom:8px;
+	background-color: #FFE;
+	cursor:pointer;
+}
+
+.content .form label {
+	font-family: Lucida Grande, sans-serif;
+	font-size: 12pt;
+	margin-bottom:8px;
+}
+
+.content .message {
+	font-family: Lucida Grande, sans-serif;
+	font-size: 12pt;
+	border: 1px dashed #844;
+	margin-left:100px;
+	margin-right:100px;
+	padding:4px;
+}
+
+.survey {
+	border: 1px dotted #AAA;
+	margin-left:100px;
+	margin-right:100px;
+	margin-bottom:20px;
+}
+
+.survey .question {
+	font-family: Lucida Grande, sans-serif;
+	font-size: 14pt;
+	text-align:center;
+	padding-top:5px;
+	padding-bottom:5px;
+}
+
+.survey .response {
+	font-family: Lucida Grande, sans-serif;
+	font-size: 12pt;
+	text-align:center;
+	border-top: 1px dashed #AAA;
+	text-align:right;
+	padding-top:5px;
+	padding-bottom:5px;
+}
+
+.survey .response .responseTitle {
+	display:inline-block;
+	font-family: Lucida Grande, sans-serif;
+	font-size: 12pt;
+}
+
+.survey .response .chart {
+	display:inline-block;
+	width:260px;
+	height:20px;
+	border: 1px dotted #AAA;
+	vertical-align:top;
+}
+
+.survey .response .chart rect {
+	fill:#AAA;
+	stroke-width:0;
+}
+
+.survey .response .count {
+	display:inline-block;
+	font-family: Lucida Grande, sans-serif;
+	font-size: 12pt;
+	width:80px;
+	margin-right:15px;
+}
+
+.survey .response .voteForm {
+	display:inline-block;
+}
+
+.survey .response .voteForm .submit {
+	font-family: Lucida Grande, sans-serif;
+	font-size: 12pt;
+	border: 1px solid #AAA;
+	margin-right:15px;
+	background-color: #FFE;
+}
