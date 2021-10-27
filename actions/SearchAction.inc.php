@@ -17,7 +17,9 @@ class SearchAction extends Action {
 	 * @see Action::run()
 	 */
 	public function run() {
-		/* TODO  */
+		$keyword = $_POST['keyword'];
+		
+		
 	}
 
 }
