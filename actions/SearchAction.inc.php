@@ -18,8 +18,23 @@ class SearchAction extends Action {
 	 */
 	public function run() {
 		$keyword = $_POST['keyword'];
-		
-		
+
+		if(empty($keyword)) {
+		    $this->setModel(new MessageModel());
+		    $this->getModel()->setMessage("Vous devez remplir le champ!");
+		    $this->setView(getViewByName("Message"));
+		} else {
+    		//Traitement de la recherche
+    		//Mocking des données
+		    $surveys = [
+    		    new Survey('Bob', 'Quel est ton nom?'),
+    		    new Survey('Fred', 'Quel est ton âge?'),
+    		];
+    		
+		    $this->setModel(new SurveysModel());
+		    $this->getModel()->setSurveys($surveys);
+		    $this->setView(getViewByName("Surveys"));
+		}
 	}
 
 }

@@ -26,9 +26,9 @@ function getAction() {
 			'UpdateUser',
 			'AddSurveyForm',
 			'AddSurvey',
-			'GetMySurveys',
+			'GetMySurveys',*/
 			'Search',
-			'Vote'*/);
+			/*'Vote'*/);
 
 	if (!in_array($action, $actions)) $action = 'Default';
 	return getActionByName($action);
