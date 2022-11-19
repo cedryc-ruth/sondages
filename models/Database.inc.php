@@ -82,8 +82,19 @@ class Database {
 	 * @return boolean True si le couple est correct, false sinon.
 	 */
 	public function checkPassword($nickname, $password) {
-		/* TODO  */
-		return true;
+		$nickname = $this->connection->quote($nickname);
+		
+		$query = "SELECT password FROM users WHERE nickname=$nickname";
+		
+		$stmt = $this->connection->query($query);
+
+		$row = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+		if(!empty($row) && password_verify($password, $row['password'])) {
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
