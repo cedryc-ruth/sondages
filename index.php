@@ -19,8 +19,8 @@ function getAction() {
 
 	$actions = array('Default',
 			/*'SignUpForm',
-			'SignUp',
-			'Logout',*/
+			'SignUp',*/
+			'Logout',
 			'Login',
 			/*'UpdateUserForm',
 			'UpdateUser',
