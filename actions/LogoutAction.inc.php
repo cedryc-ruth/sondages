@@ -1,7 +1,8 @@
 <?php 
+namespace App\Actions;
 
-require_once("models/Model.inc.php");
-require_once("actions/Action.inc.php");
+use App\Models\Model;
+use App\Views\DefaultView;
 
 class LogoutAction extends Action {
 

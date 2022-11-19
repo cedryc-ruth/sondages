@@ -1,7 +1,7 @@
 <?php
+namespace App\Actions;
 
-require_once("models/MessageModel.inc.php");
-require_once("models/Database.inc.php");
+use App\Models\Database;
 
 abstract class Action {
 	private $view;

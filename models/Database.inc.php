@@ -88,7 +88,7 @@ class Database {
 		
 		$stmt = $this->connection->query($query);
 
-		$row = $stmt->fetch(\PDO::FETCH_ASSOC);
+		$row = $stmt->fetch(PDO::FETCH_ASSOC);
 
 		if(!empty($row) && password_verify($password, $row['password'])) {
 			return true;
