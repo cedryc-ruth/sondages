@@ -1,6 +1,10 @@
 <?php
 namespace App\Models;
 
+require '../libraries/rb-sqlite.php';
+
+use RedBeanPHP as R;
+
 class Database {
 
 	private $connection;
@@ -10,14 +14,14 @@ class Database {
 	 * est créée à l'aide de la méthode createDataBase().
 	 */
 	public function __construct() {
+		R::setup("sqlite:database.sqlite");
 
-
-		$this->connection = new \PDO("sqlite:database.sqlite");
+		$this->connection = true;
 		if (!$this->connection) die("impossible d'ouvrir la base de données");
 
-		$q = $this->connection->query('SELECT name FROM sqlite_master WHERE type="table"');
+		$rows = R::getAll('SELECT name FROM sqlite_master WHERE type="table"');
 
-		if (count($q->fetchAll())==0) {
+		if (count($rows)==0) {
 			$this->createDataBase();
 		}
 	}
@@ -81,15 +85,9 @@ class Database {
 	 * @return boolean True si le couple est correct, false sinon.
 	 */
 	public function checkPassword($nickname, $password) {
-		$nickname = $this->connection->quote($nickname);
-		
-		$query = "SELECT password FROM users WHERE nickname=$nickname";
-		
-		$stmt = $this->connection->query($query);
+		$user = R::find( 'users', ' nickname=?', [ $nickname ] );	//Requête préparée
 
-		$row = $stmt->fetch(\PDO::FETCH_ASSOC);
-
-		if(!empty($row) && password_verify($password, $row['password'])) {
+		if(!empty($user) && password_verify($password, $user['password'])) {
 			return true;
 		}
 
