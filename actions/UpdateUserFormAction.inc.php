@@ -1,4 +1,4 @@
-<?
+<?php
 require_once("models/MessageModel.inc.php");
 require_once("actions/Action.inc.php");
 
