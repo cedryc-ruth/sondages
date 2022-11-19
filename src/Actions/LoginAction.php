@@ -34,7 +34,7 @@ class LoginAction extends Action {
 			$this->setModel($model);
 
 			//Déterminer la vue à afficher
-			$view = getViewByName('Default');
+			$view = new DefaultView();
 
 			//Associer la vue à l'action
 			$this->setView($view);
@@ -49,7 +49,7 @@ class LoginAction extends Action {
 			$this->setModel($model);
 
 			//Déterminer la vue à afficher
-			$view = getViewByName('Default');
+			$view = new DefaultView();
 
 			//Associer la vue à l'action
 			$this->setView($view);

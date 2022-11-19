@@ -1,6 +1,5 @@
 <?php
-require_once("models/Survey.inc.php");
-require_once("models/Response.inc.php");
+namespace App\Models;
 
 class Database {
 
@@ -13,7 +12,7 @@ class Database {
 	public function __construct() {
 
 
-		$this->connection = new PDO("sqlite:database.sqlite");
+		$this->connection = new \PDO("sqlite:database.sqlite");
 		if (!$this->connection) die("impossible d'ouvrir la base de données");
 
 		$q = $this->connection->query('SELECT name FROM sqlite_master WHERE type="table"');
@@ -88,7 +87,7 @@ class Database {
 		
 		$stmt = $this->connection->query($query);
 
-		$row = $stmt->fetch(PDO::FETCH_ASSOC);
+		$row = $stmt->fetch(\PDO::FETCH_ASSOC);
 
 		if(!empty($row) && password_verify($password, $row['password'])) {
 			return true;

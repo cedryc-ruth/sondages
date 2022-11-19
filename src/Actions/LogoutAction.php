@@ -17,7 +17,7 @@ class LogoutAction extends Action {
 		$this->setSessionLogin(null);
 		$this->setModel(new Model());
 		$this->getModel()->setLogin($this->getSessionLogin());
-		$this->setView(getViewByName("Default"));
+		$this->setView(new DefaultView());
 	}
 
 }
