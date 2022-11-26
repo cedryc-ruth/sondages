@@ -13,5 +13,7 @@
             "email": "ceruth@epfc.eu"
         }
     ],
-    "require": {}
+    "require": {
+        "twig/twig": "^3.0"
+    }
 }
