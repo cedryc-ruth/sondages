@@ -1,9 +1,9 @@
 <?php
 namespace App\Models;
 
-require '../libraries/rb-sqlite.php';
+require 'src/libraries/rb-sqlite.php';
 
-use RedBeanPHP as R;
+use R;
 
 class Database {
 
@@ -74,7 +74,7 @@ class Database {
 	 */
 	private function checkNicknameAvailability($nickname) {
 		/* TODO  */
-		return false;
+		return true;
 	}
 
 	/**
@@ -85,9 +85,9 @@ class Database {
 	 * @return boolean True si le couple est correct, false sinon.
 	 */
 	public function checkPassword($nickname, $password) {
-		$user = R::find( 'users', ' nickname=?', [ $nickname ] );	//Requête préparée
+		$user = R::findOne( 'users', ' nickname=?', [ $nickname ] );	//Requête préparée
 
-		if(!empty($user) && password_verify($password, $user['password'])) {
+		if(!empty($user) && password_verify($password, $user->password)) {
 			return true;
 		}
 
@@ -106,8 +106,25 @@ class Database {
 	 * @return boolean|string True si le couple a été ajouté avec succès, un message d'erreur sinon.
 	 */
 	public function addUser($nickname, $password) {
-		/* TODO  */
-		return true;
+		if(!$this->checkNicknameValidity($nickname)) {
+			return "Le pseudo doit contenir entre 3 et 10 lettres.";
+		}
+
+		if(!$this->checkNicknameAvailability($nickname)) {
+			return "Le pseudo existe déjà.";
+		}
+				
+		if(!$this->checkPasswordValidity($password)) {
+			return "Le mot de passe doit contenir entre 3 et 10 caractères.";
+		}
+
+		$user = R::dispense('users');
+		$user->nickname = $nickname;
+		$user->password = password_hash($password,PASSWORD_BCRYPT);
+
+		$id = R::store($user);
+
+		return $id ? true : false;
 	}
 
 	/**

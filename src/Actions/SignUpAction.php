@@ -1,7 +1,9 @@
 <?php
+namespace App\Actions;
 
-require_once("models/MessageModel.inc.php");
-require_once("actions/Action.inc.php");
+use App\Models\MessageModel;
+use App\Views\MessageView;
+use App\Views\SignUpFormView;
 
 class SignUpAction extends Action {
 
@@ -22,14 +24,38 @@ class SignUpAction extends Action {
 	 * @see Action::run()
 	 */
 	public function run() {
-		/* TODO  */
+		$login = $_POST['signUpLogin'];
+		$password = $_POST['signUpPassword'];
+		$confPass = $_POST['signUpPassword2'];
+
+		if($password!=$confPass) {
+			$this->createSignUpFormView("Le mot de passe et sa confirmation sont différents.");
+			return;
+		}
+		
+		$result = $this->database->addUSer($login, $password);
+	
+		if(is_string($result)) {
+			$this->createSignUpFormView($result);
+			return;
+		}
+
+		if($result===false) {
+			$this->createSignUpFormView("Une erreur d'insertion est survenue dans la base de données.");
+			return;
+		}
+
+		$this->setModel(new MessageModel());
+		$this->getModel()->setMessage("Inscription réussie.");
+		$this->getModel()->setLogin($this->getSessionLogin());
+		$this->setView(new MessageView());
 	}
 
 	private function createSignUpFormView($message) {
 		$this->setModel(new MessageModel());
 		$this->getModel()->setMessage($message);
 		$this->getModel()->setLogin($this->getSessionLogin());
-		$this->setView(getViewByName("SignUpForm"));
+		$this->setView(new SignUpFormView());
 	}
 
 }
