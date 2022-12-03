@@ -1,5 +1,5 @@
 <?php
-require_once("views/View.inc.php");
+namespace App\Views;
 
 class SignUpFormView extends View {
 	

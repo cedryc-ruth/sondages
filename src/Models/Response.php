@@ -1,4 +1,6 @@
 <?php
+namespace App\Models;
+
 class Response {
 	
 	private $id;

@@ -1,7 +1,9 @@
 <?php
+namespace App\Actions;
 
-require_once("models/MessageModel.inc.php");
-require_once("actions/Action.inc.php");
+use App\Models\MessageModel;
+use App\Views\MessageView;
+use App\Views\SignUpFormView;
 
 class SignUpFormAction extends Action {
 
@@ -13,7 +15,7 @@ class SignUpFormAction extends Action {
 	public function run() {
 		$this->setModel(new MessageModel());
 		$this->getModel()->setLogin($this->getSessionLogin());
-		$this->setView(getViewByName("SignUpForm"));
+		$this->setView(new SignUpFormView());
 	}
 
 }

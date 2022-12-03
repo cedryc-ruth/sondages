@@ -10,15 +10,15 @@ function getAction() {
 	else $action = $_REQUEST['action'];
 
 	$actions = array('Default',
-			/*'SignUpForm',
-			'SignUp',*/
+			'SignUpForm',
+			'SignUp',
 			'Logout',
 			'Login',
 			/*'UpdateUserForm',
-			'UpdateUser',
+			'UpdateUser',*/
 			'AddSurveyForm',
 			'AddSurvey',
-			'GetMySurveys',
+			/*'GetMySurveys',
 			'Search',
 			'Vote'*/);
 

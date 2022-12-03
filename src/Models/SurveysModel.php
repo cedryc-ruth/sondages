@@ -1,5 +1,5 @@
 <?php
-require_once("models/Model.inc.php");
+namespace App\Models;
 
 class SurveysModel extends Model {
 
