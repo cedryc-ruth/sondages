@@ -17,6 +17,7 @@ class Database {
 		R::setup("sqlite:database.sqlite");
 
 		$this->connection = true;
+
 		if (!$this->connection) die("impossible d'ouvrir la base de données");
 
 		$rows = R::getAll('SELECT name FROM sqlite_master WHERE type="table"');
@@ -39,7 +40,19 @@ class Database {
 	 *		count integer);
 	 */
 	private function createDataBase() {
-		/* TODO  */
+		R::exec( 'CREATE TABLE users(nickname char(20), password char(50));' );
+		R::exec( 'CREATE TABLE surveys(id integer primary key autoincrement, 
+			owner char(20), question char(255));' );
+		R::exec( 'CREATE TABLE responses(id integer primary key autoincrement,
+				id_survey integer,
+				title char(255),
+				count integer);');
+
+		$rows = R::getAll('SELECT name FROM sqlite_master WHERE type="table"');
+
+		if (count($rows)==0) {
+			die("Impossible de créer les tables dans la base de données !");
+		}
 	}
 
 	/**
@@ -73,8 +86,9 @@ class Database {
 	 * @return boolean True si le pseudonyme est disponible, false sinon.
 	 */
 	private function checkNicknameAvailability($nickname) {
-		/* TODO  */
-		return true;
+		$user = R::findOne( 'users', ' nickname=?', [ $nickname ] );	//Requête préparée
+
+		return empty($user);
 	}
 
 	/**
@@ -138,7 +152,19 @@ class Database {
 	 * @return boolean|string True si le mot de passe a été modifié, un message d'erreur sinon.
 	 */
 	public function updateUser($nickname, $password) {
-		/* TODO  */
+		if(!$this->checkPasswordValidity($password)) {
+			return "Le mot de passe doit contenir entre 3 et 10 caractères.";
+		}
+
+		$user = R::findOne( 'users', ' nickname=?', [ $nickname ] );
+
+		if(empty($user)) {
+			return "Cet utilisateur n'existe pas.";
+		}
+
+		$user->password = $password;
+		R::store($user);
+		
 		return true;
 	}
 
@@ -172,7 +198,10 @@ class Database {
 	 * @return array(Survey)|boolean Sondages trouvés par la fonction ou false si une erreur s'est produite.
 	 */
 	public function loadSurveysByOwner($owner) {
-		/* TODO  */
+		$surveys = R::find( 'surveys', 'owner = ? ', [ $owner ] );
+
+		return $surveys;
+		//Pas de gestion d'erreur
 	}
 
 	/**
@@ -182,7 +211,10 @@ class Database {
 	 * @return array(Survey)|boolean Sondages trouvés par la fonction ou false si une erreur s'est produite.
 	 */
 	public function loadSurveysByKeyword($keyword) {
-		/* TODO  */
+		$surveys = R::find( 'surveys', 'title LIKE ? ', [ "%$keyword%" ] );
+
+		return $surveys;
+		//Pas de gestion d'erreur
 	}
 
 
@@ -193,7 +225,16 @@ class Database {
 	 * @return boolean True si le vote a été enregistré, false sinon.
 	 */
 	public function vote($id) {
-		/* TODO  */
+		$response = R::findOne( 'responses', 'id=?', [ $id ] );
+
+		if(!empty($response)) {
+			$response->count++;
+			R::store($response);
+
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -205,7 +246,19 @@ class Database {
 	 */
 	private function loadSurveys($arraySurveys) {
 		$surveys = array();
-		/* TODO  */
+		
+		foreach($arraySurveys as $row) {
+			//Dénormaliser le sondage
+			$s = new Survey($row['title'],$row['owner']);
+			$s->setId($row['id']);
+
+			//Récupérer les réponses
+			$responses = R::find( 'responses', 'survey_id = ? ', [ $row['id'] ] );
+			$this->loadResponses($s, $responses);
+
+			$surveys[] = $s;
+		}
+
 		return $surveys;
 	}
 
@@ -217,7 +270,15 @@ class Database {
 	 * @return array(Response)|boolean Le tableau de réponses ou false si une erreur s'est produite.
 	 */
 	private function loadResponses(&$survey, $arrayResponses) {
-		/* TODO  */
+		foreach($arrayResponses as $row) {
+			//Dénormaliser la réponse
+			$r = new Response($row['survey_id'],$row['title'],$row['count']);
+			$r->setId($row['id']);
+
+			$responses[] = $r;
+		}
+
+		return $responses;
 	}
 
 }
