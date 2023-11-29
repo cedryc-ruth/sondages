@@ -1,7 +1,7 @@
 <?php
 namespace App\Models;
 
-require 'src/libraries/rb-sqlite.php';
+require 'libraries/rb-sqlite.php';
 
 use R;
 
