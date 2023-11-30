@@ -208,7 +208,7 @@ class Database {
 	/**
 	 * Sauvegarde une réponse dans la base de donnée et met à jour son indentifiant.
 	 *
-	 * @param Survey $response Réponse à sauvegarder.
+	 * @param Response $response Réponse à sauvegarder.
 	 * @return boolean True si la sauvegarde a été réalisée avec succès, false sinon.
 	 */
 	private function saveResponse(Response &$response): bool {
@@ -239,10 +239,13 @@ class Database {
 	 * @return array(Survey)|boolean Sondages trouvés par la fonction ou false si une erreur s'est produite.
 	 */
 	public function loadSurveysByOwner(string $owner): array|bool {
-		$surveys = R::find( 'surveys', 'owner = ? ', [ $owner ] );
+		try {
+			$surveys = R::find( 'surveys', 'owner = ? ', [ $owner ] );
 
-		return $surveys;
-		//Pas de gestion d'erreur
+			return $surveys;
+		} catch(Exception $e) {
+			return false;
+		}
 	}
 
 	/**
@@ -252,10 +255,13 @@ class Database {
 	 * @return array(Survey)|boolean Sondages trouvés par la fonction ou false si une erreur s'est produite.
 	 */
 	public function loadSurveysByKeyword(string $keyword): array|bool {
-		$surveys = R::find( 'surveys', 'title LIKE ? ', [ "%$keyword%" ] );
+		try {
+			$surveys = R::find( 'surveys', 'title LIKE ? ', [ "%$keyword%" ] );
 
-		return $surveys;
-		//Pas de gestion d'erreur
+			return $surveys;
+		} catch(Exception $e) {
+			return false;
+		}
 	}
 
 
