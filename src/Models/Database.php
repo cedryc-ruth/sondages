@@ -63,8 +63,7 @@ class Database {
 	 * @return boolean True si le pseudonyme est valide, false sinon.
 	 */
 	private function checkNicknameValidity($nickname) {
-		/* TODO  */
-		return true;
+		return preg_match('/^[a-zA-Z]{3,10}$/',$nickname);
 	}
 
 	/**
@@ -75,8 +74,7 @@ class Database {
 	 * @return boolean True si le mot de passe est valide, false sinon.
 	 */
 	private function checkPasswordValidity($password) {
-		/* TODO  */
-		return true;
+		return preg_match('/^\S{3,10}$/',$password);
 	}
 
 	/**
@@ -120,6 +118,7 @@ class Database {
 	 * @return boolean|string True si le couple a été ajouté avec succès, un message d'erreur sinon.
 	 */
 	public function addUser($nickname, $password) {
+		//Validation des données utilisateur
 		if(!$this->checkNicknameValidity($nickname)) {
 			return "Le pseudo doit contenir entre 3 et 10 lettres.";
 		}
@@ -132,6 +131,7 @@ class Database {
 			return "Le mot de passe doit contenir entre 3 et 10 caractères.";
 		}
 
+		//Ajout de l'utilisateur
 		$user = R::dispense('users');
 		$user->nickname = $nickname;
 		$user->password = password_hash($password,PASSWORD_BCRYPT);
@@ -152,6 +152,7 @@ class Database {
 	 * @return boolean|string True si le mot de passe a été modifié, un message d'erreur sinon.
 	 */
 	public function updateUser($nickname, $password) {
+		//Validation des données utilisateur
 		if(!$this->checkPasswordValidity($password)) {
 			return "Le mot de passe doit contenir entre 3 et 10 caractères.";
 		}
@@ -162,6 +163,7 @@ class Database {
 			return "Cet utilisateur n'existe pas.";
 		}
 
+		//Mise à jour de l'utilisateur
 		$user->password = $password;
 		R::store($user);
 		
@@ -176,8 +178,42 @@ class Database {
 	 * @return boolean True si la sauvegarde a été réalisée avec succès, false sinon.
 	 */
 	public function saveSurvey(&$survey) {
-		/* TODO  */
-		return true;
+		R::begin();
+		try{
+			R::store( $survey );
+
+			try {
+
+			} catch( Exception $e ) {
+				R::rollback();
+			}
+
+			R::commit();
+		} catch( Exception $e ) {
+			R::rollback();
+		}
+		$user = R::findOne( 'users', ' nickname=?', [ $nickname ] );
+            $query = $this->connection->prepare("INSERT INTO surveys(owner,question) VALUES (?,?)");
+
+            $r = $query->execute(array($survey->getOwner(), $survey->getQuestion()));
+            if ($r === false) {
+                $this->connection->rollback();
+                return false;
+            }
+            
+            $id = $this->connection->lastInsertId();
+            $survey->setId($id);
+            $responses = $survey->getResponses();
+            
+            foreach ($responses as &$response) {
+                if ($this->saveResponse($response)===false) {
+                    $this->connection->rollback();
+                    return false;
+                }
+            }
+            
+            $this->connection->commit();
+            return true;
 	}
 
 	/**
@@ -187,8 +223,22 @@ class Database {
 	 * @return boolean True si la sauvegarde a été réalisée avec succès, false sinon.
 	 */
 	private function saveResponse(&$response) {
-		/* TODO  */
-		return true;
+		$query = $this->connection->prepare("INSERT INTO responses(id_survey, title, count) 
+                                                    VALUES(:id_survey, :title, :count)");
+            if ($query!==false) {
+                $r = $query->execute( array(
+                            'id_survey' => $response->getSurvey()->getId(),
+                            'title' => $response->getTitle(),
+                            'count'=> $response->getCount() ));
+                
+                if($r!==false) {
+                    $id = $this->connection->lastInsertId();
+                    $response->setId($id);
+
+                    return true;
+                }
+            }
+            return false;
 	}
 
 	/**
@@ -270,11 +320,16 @@ class Database {
 	 * @return array(Response)|boolean Le tableau de réponses ou false si une erreur s'est produite.
 	 */
 	private function loadResponses(&$survey, $arrayResponses) {
+		if(count($arrayResponses)==0) {
+			return false;
+		}
+
 		foreach($arrayResponses as $row) {
 			//Dénormaliser la réponse
 			$r = new Response($row['survey_id'],$row['title'],$row['count']);
 			$r->setId($row['id']);
 
+			$survey->addResponse($r);
 			$responses[] = $r;
 		}
 
@@ -282,5 +337,4 @@ class Database {
 	}
 
 }
-
 ?>
