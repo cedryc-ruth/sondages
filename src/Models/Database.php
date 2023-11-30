@@ -39,7 +39,7 @@ class Database {
 	 *		title char(255),
 	 *		count integer);
 	 */
-	private function createDataBase() {
+	private function createDataBase(): void {
 		R::exec( 'CREATE TABLE users(nickname char(20), password char(50));' );
 		R::exec( 'CREATE TABLE surveys(id integer primary key autoincrement, 
 			owner char(20), question char(255));' );
@@ -62,7 +62,7 @@ class Database {
 	 * @param string $nickname Pseudonyme à vérifier.
 	 * @return boolean True si le pseudonyme est valide, false sinon.
 	 */
-	private function checkNicknameValidity($nickname) {
+	private function checkNicknameValidity(string $nickname): bool {
 		return preg_match('/^[a-zA-Z]{3,10}$/',$nickname);
 	}
 
@@ -73,7 +73,7 @@ class Database {
 	 * @param string $password Mot de passe à vérifier.
 	 * @return boolean True si le mot de passe est valide, false sinon.
 	 */
-	private function checkPasswordValidity($password) {
+	private function checkPasswordValidity(string $password): bool {
 		return preg_match('/^\S{3,10}$/',$password);
 	}
 
@@ -83,7 +83,7 @@ class Database {
 	 * @param string $nickname Pseudonyme à vérifier.
 	 * @return boolean True si le pseudonyme est disponible, false sinon.
 	 */
-	private function checkNicknameAvailability($nickname) {
+	private function checkNicknameAvailability(string $nickname): bool {
 		$user = R::findOne( 'users', ' nickname=?', [ $nickname ] );	//Requête préparée
 
 		return empty($user);
@@ -96,7 +96,7 @@ class Database {
 	 * @param string $password Mot de passe.
 	 * @return boolean True si le couple est correct, false sinon.
 	 */
-	public function checkPassword($nickname, $password) {
+	public function checkPassword(string $nickname, string $password): bool {
 		$user = R::findOne( 'users', ' nickname=?', [ $nickname ] );	//Requête préparée
 
 		if(!empty($user) && password_verify($password, $user->password)) {
@@ -117,7 +117,7 @@ class Database {
 	 * @param string $password Mot de passe.
 	 * @return boolean|string True si le couple a été ajouté avec succès, un message d'erreur sinon.
 	 */
-	public function addUser($nickname, $password) {
+	public function addUser(string $nickname, string $password): bool|string {
 		//Validation des données utilisateur
 		if(!$this->checkNicknameValidity($nickname)) {
 			return "Le pseudo doit contenir entre 3 et 10 lettres.";
@@ -151,7 +151,7 @@ class Database {
 	 * @param string $password Nouveau mot de passe.
 	 * @return boolean|string True si le mot de passe a été modifié, un message d'erreur sinon.
 	 */
-	public function updateUser($nickname, $password) {
+	public function updateUser(string $nickname, string $password): bool|string {
 		//Validation des données utilisateur
 		if(!$this->checkPasswordValidity($password)) {
 			return "Le mot de passe doit contenir entre 3 et 10 caractères.";
@@ -177,7 +177,7 @@ class Database {
 	 * @param Survey $survey Sondage à sauvegarder.
 	 * @return boolean True si la sauvegarde a été réalisée avec succès, false sinon.
 	 */
-	public function saveSurvey(&$survey) {
+	public function saveSurvey(Survey &$survey): bool {
 		R::begin();
 
 		try {
@@ -211,7 +211,7 @@ class Database {
 	 * @param Survey $response Réponse à sauvegarder.
 	 * @return boolean True si la sauvegarde a été réalisée avec succès, false sinon.
 	 */
-	private function saveResponse(&$response) {
+	private function saveResponse(Response &$response): bool {
 		R::begin();
 
 		try {
@@ -238,7 +238,7 @@ class Database {
 	 * @param string $owner Pseudonyme de l'utilisateur.
 	 * @return array(Survey)|boolean Sondages trouvés par la fonction ou false si une erreur s'est produite.
 	 */
-	public function loadSurveysByOwner($owner) {
+	public function loadSurveysByOwner(string $owner): array|bool {
 		$surveys = R::find( 'surveys', 'owner = ? ', [ $owner ] );
 
 		return $surveys;
@@ -251,7 +251,7 @@ class Database {
 	 * @param string $keyword Mot clé à chercher.
 	 * @return array(Survey)|boolean Sondages trouvés par la fonction ou false si une erreur s'est produite.
 	 */
-	public function loadSurveysByKeyword($keyword) {
+	public function loadSurveysByKeyword(string $keyword): array|bool {
 		$surveys = R::find( 'surveys', 'title LIKE ? ', [ "%$keyword%" ] );
 
 		return $surveys;
@@ -265,7 +265,7 @@ class Database {
 	 * @param int $id Identifiant de la réponse.
 	 * @return boolean True si le vote a été enregistré, false sinon.
 	 */
-	public function vote($id) {
+	public function vote(int $id): bool {
 		$response = R::findOne( 'responses', 'id=?', [ $id ] );
 
 		if(!empty($response)) {
@@ -285,7 +285,7 @@ class Database {
 	 * @param array $arraySurveys Tableau de lignes.
 	 * @return array(Survey)|boolean Le tableau de sondages ou false si une erreur s'est produite.
 	 */
-	private function loadSurveys($arraySurveys) {
+	private function loadSurveys(array $arraySurveys): array|bool {
 		$surveys = array();
 		
 		foreach($arraySurveys as $row) {
@@ -310,7 +310,7 @@ class Database {
 	 * @param array $arraySurveys Tableau de lignes.
 	 * @return array(Response)|boolean Le tableau de réponses ou false si une erreur s'est produite.
 	 */
-	private function loadResponses(&$survey, $arrayResponses) {
+	private function loadResponses(Survey &$survey, array $arrayResponses): array|bool {
 		if(count($arrayResponses)==0) {
 			return false;
 		}
