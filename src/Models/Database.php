@@ -179,41 +179,30 @@ class Database {
 	 */
 	public function saveSurvey(&$survey) {
 		R::begin();
-		try{
-			R::store( $survey );
 
-			try {
+		try {
+			$id = R::store( $survey );
 
-			} catch( Exception $e ) {
-				R::rollback();
-			}
-
-			R::commit();
-		} catch( Exception $e ) {
-			R::rollback();
-		}
-		$user = R::findOne( 'users', ' nickname=?', [ $nickname ] );
-            $query = $this->connection->prepare("INSERT INTO surveys(owner,question) VALUES (?,?)");
-
-            $r = $query->execute(array($survey->getOwner(), $survey->getQuestion()));
-            if ($r === false) {
-                $this->connection->rollback();
+			if ($id === false) {
+                R::rollback();
                 return false;
             }
             
-            $id = $this->connection->lastInsertId();
             $survey->setId($id);
             $responses = $survey->getResponses();
             
             foreach ($responses as &$response) {
                 if ($this->saveResponse($response)===false) {
-                    $this->connection->rollback();
+                    R::rollback();
                     return false;
                 }
             }
-            
-            $this->connection->commit();
-            return true;
+
+			R::commit();
+			return true;
+		} catch( Exception $e ) {
+			R::rollback();
+		}
 	}
 
 	/**
@@ -223,22 +212,24 @@ class Database {
 	 * @return boolean True si la sauvegarde a été réalisée avec succès, false sinon.
 	 */
 	private function saveResponse(&$response) {
-		$query = $this->connection->prepare("INSERT INTO responses(id_survey, title, count) 
-                                                    VALUES(:id_survey, :title, :count)");
-            if ($query!==false) {
-                $r = $query->execute( array(
-                            'id_survey' => $response->getSurvey()->getId(),
-                            'title' => $response->getTitle(),
-                            'count'=> $response->getCount() ));
-                
-                if($r!==false) {
-                    $id = $this->connection->lastInsertId();
-                    $response->setId($id);
+		R::begin();
 
-                    return true;
-                }
-            }
-            return false;
+		try {
+			$id = R::store($response);
+
+			if ($query===false) {
+				R::rollback();
+				return false;
+			}
+
+			$response->setId($id);
+
+			R::commit();
+			return true;
+		} catch( Exception $e ) {
+			R::rollback();
+		}
+
 	}
 
 	/**
