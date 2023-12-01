@@ -15,5 +15,8 @@
     ],
     "require": {
         "maximebf/debugbar": "^1.19"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.5"
     }
 }

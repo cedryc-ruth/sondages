@@ -212,7 +212,7 @@ class Database {
 	}
 
 	/**
-	 * Sauvegarde une réponse dans la base de donnée et met à jour son indentifiant.
+	 * Sauvegarde une réponse dans la base de donnée et met à jour son identifiant.
 	 *
 	 * @param Response $response Réponse à sauvegarder.
 	 * @return boolean True si la sauvegarde a été réalisée avec succès, false sinon.
@@ -282,7 +282,7 @@ class Database {
 
 
 	/**
-	 * Enregistre le vote d'un utilisateur pour la réponse d'indentifiant $id.
+	 * Enregistre le vote d'un utilisateur pour la réponse d'identifiant $id.
 	 *
 	 * @param int $id Identifiant de la réponse.
 	 * @return boolean True si le vote a été enregistré, false sinon.
@@ -352,5 +352,15 @@ class Database {
 		return $responses;
 	}
 
+	/**
+	 * Supprime une réponse dans la base de donnée.
+	 *
+	 * @param Response $response Réponse à supprimer.
+	 * @return boolean True si la suppression a été réalisée avec succès, false sinon.
+	 */
+	public function deleteResponse(Response &$response): bool {
+		/* TODO */
+		return false;
+	}
 }
 ?>
