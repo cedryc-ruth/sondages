@@ -17,7 +17,20 @@ class SearchAction extends Action {
 	 * @see Action::run()
 	 */
 	public function run() {
-		/* TODO  */
+		if(!empty($_POST["keyword"])) {
+            $keyword = $_POST["keyword"];
+            
+            if($tabSurveys = $this->database->loadSurveysByKeyword($keyword)) {
+                $this->setModel(new SurveysModel());
+                $this->getModel()->setSurveys($tabSurveys);
+                $this->getModel()->setLogin($this->getSessionLogin());
+                $this->setView(new SurveysView());
+            } else {
+                $this->setMessageView('Une erreur s\'est produite sur le serveur. Veuillez contacter l\'administrateur.');
+            }           
+        } else {
+            $this->setMessageView('Vous devez entrer un mot clé avant de lancer la recherche.');
+        }
 	}
 
 }

@@ -14,12 +14,21 @@ class Database {
 	 * est créée à l'aide de la méthode createDataBase().
 	 */
 	public function __construct() {
-		R::setup("sqlite:database.sqlite");
-
+		$res = R::setup("sqlite:database.sqlite");
+		$isConnected = R::testConnection();
+var_dump($isConnected);die;
 		$this->connection = true;
 
 		if (!$this->connection) die("impossible d'ouvrir la base de données");
+		$book  = R::find( 'surveys', 'id > 4 ');
 
+die('ici Database');
+		$surveys = R::getAll(
+			'SELECT * FROM surveys WHERE id > ? ',
+			[ 2 ] );
+
+$user = R::dispense('users');
+		var_dump($surveys);die('ici');
 		$rows = R::getAll('SELECT name FROM sqlite_master WHERE type="table"');
 
 		if (count($rows)==0) {

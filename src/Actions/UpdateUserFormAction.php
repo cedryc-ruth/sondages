@@ -1,6 +1,9 @@
 <?php
-require_once("models/MessageModel.inc.php");
-require_once("actions/Action.inc.php");
+namespace App\Actions;
+
+use App\Models\MessageModel;
+use App\Views\MessageView;
+use App\Views\UpdateUserFormView;
 
 class UpdateUserFormAction extends Action {
 
@@ -18,7 +21,7 @@ class UpdateUserFormAction extends Action {
 
 		$this->setModel(new MessageModel());
 		$this->getModel()->setLogin($this->getSessionLogin());
-		$this->setView(getViewByName("UpdateUserForm"));
+		$this->setView(new UpdateUserFormView());
 	}
 
 }

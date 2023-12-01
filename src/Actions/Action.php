@@ -2,6 +2,7 @@
 namespace App\Actions;
 
 use App\Models\Database;
+use App\Views\MessageView;
 
 abstract class Action {
 	private $view;
@@ -65,7 +66,7 @@ abstract class Action {
 		$this->setModel(new MessageModel());
 		$this->getModel()->setMessage($message);
 		$this->getModel()->setLogin($this->getSessionLogin());
-		$this->setView(getViewByName("Message"));
+		$this->setView(new MessageView());
 	}
 
 	/**

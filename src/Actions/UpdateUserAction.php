@@ -1,7 +1,9 @@
 <?php
+namespace App\Actions;
 
-require_once("models/MessageModel.inc.php");
-require_once("actions/Action.inc.php");
+use App\Models\MessageModel;
+use App\Views\MessageView;
+use App\Views\UpdateUserFormView;
 
 class UpdateUserAction extends Action {
 
@@ -22,14 +24,30 @@ class UpdateUserAction extends Action {
 	 * @see Action::run()
 	 */
 	public function run() {
-		/* TODO  */
+		if(!empty($_POST['updatePassword']) && !empty($_POST['updatePassword2'])) {
+            if($_POST['updatePassword']==$_POST['updatePassword2']) {
+                $nickname = $this->getSessionLogin();
+                $password = $_POST['updatePassword'];
+                $dbResult = $this->database->updateUser($nickname,$password);
+                
+                if($dbResult===true) {
+                    $this->setMessageView('Modification enregistrée.');
+                } else {
+                    $this->createUpdateUserFormView($dbResult);
+                }
+            } else {
+                $this->createUpdateUserFormView('Les mots de passe doivent être identiques!');
+            }
+        } else {
+            $this->createUpdateUserFormView('Veuillez remplir tous les champs, svp.');
+        }
 	}
 
 	private function createUpdateUserFormView($message) {
 		$this->setModel(new MessageModel());
 		$this->getModel()->setMessage($message);
 		$this->getModel()->setLogin($this->getSessionLogin());
-		$this->setView(getViewByName("UpdateUserForm"));
+		$this->setView(new UpdateUserFormView());
 	}
 
 }

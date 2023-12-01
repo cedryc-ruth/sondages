@@ -1,9 +1,10 @@
 <?php
+namespace App\Actions;
 
-require_once("models/MessageModel.inc.php");
-require_once("models/Survey.inc.php");
-require_once("models/Response.inc.php");
-require_once("actions/Action.inc.php");
+use App\Models\MessageModel;
+use App\Models\Survey;
+use App\Models\Response;
+use App\Views\AddSurveyFormView;
 
 class AddSurveyAction extends Action {
 
@@ -27,8 +28,48 @@ class AddSurveyAction extends Action {
 	 * @see Action::run()
 	 */
 	public function run() {
-		/* TODO  */
+		if ($this->getSessionLogin()===null) {
+            $this->setMessageView("Vous devez être authentifié.");
+            return;
+        }
+        
+        if(!empty($_POST['questionSurvey'])) {
+            $question = htmlentities($_POST['questionSurvey']);
+            
+            $tabReponses = array();
+            for($i=1;$i<=5;$i++) {
+                if(!empty($_POST['responseSurvey'.$i])) {
+                    $tabReponses[] = htmlentities($_POST['responseSurvey'.$i]);
+                }
+            }
+            
+            if(sizeof($tabReponses)>=2) {
+                $survey = new Survey($this->getSessionLogin(),$question);
+                
+                foreach($tabReponses as $title) {
+                    $response = new Response($survey,$title);
+                    $survey->addResponse($response);
+                }
+                
+                if($this->database->saveSurvey($survey)) {
+                    $this->createAddSurveyFormView('Merci, nous avons ajouté votre sondage.');
+                } else {
+                    $this->createAddSurveyFormView('Une erreur est survenue sur le serveur. Veuillez contacter l\'administrateur.');               
+                }
+            } else {
+                $this->createAddSurveyFormView('Il faut saisir au moins 2 réponses.');
+            }
+        } else {
+            $this->createAddSurveyFormView('La question est obligatoire.');
+        }
 	}
+
+	private function createAddSurveyFormView($message) {
+        $this->setModel(new MessageModel());
+        $this->getModel()->setMessage($message);
+        $this->getModel()->setLogin($this->getSessionLogin());
+        $this->setView(new AddSurveyFormView());
+    }
 
 }
 

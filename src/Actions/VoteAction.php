@@ -1,7 +1,5 @@
 <?php
-
-require_once("models/SurveysModel.inc.php");
-require_once("actions/Action.inc.php");
+namespace App\Actions;
 
 class VoteAction extends Action {
 
