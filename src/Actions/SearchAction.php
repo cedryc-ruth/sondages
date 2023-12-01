@@ -1,7 +1,8 @@
 <?php
+namespace App\Actions;
 
-require_once("models/SurveysModel.inc.php");
-require_once("actions/Action.inc.php");
+use App\Models\SurveysModel;
+use App\Views\SurveysView;
 
 class SearchAction extends Action {
 

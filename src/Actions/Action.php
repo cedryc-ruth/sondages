@@ -2,6 +2,7 @@
 namespace App\Actions;
 
 use App\Models\Database;
+use App\Models\MessageModel;
 use App\Views\MessageView;
 
 abstract class Action {

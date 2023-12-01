@@ -15,20 +15,11 @@ class Database {
 	 */
 	public function __construct() {
 		$res = R::setup("sqlite:database.sqlite");
-		$isConnected = R::testConnection();
-var_dump($isConnected);die;
-		$this->connection = true;
+
+		$this->connection = R::testConnection();
 
 		if (!$this->connection) die("impossible d'ouvrir la base de données");
-		$book  = R::find( 'surveys', 'id > 4 ');
 
-die('ici Database');
-		$surveys = R::getAll(
-			'SELECT * FROM surveys WHERE id > ? ',
-			[ 2 ] );
-
-$user = R::dispense('users');
-		var_dump($surveys);die('ici');
 		$rows = R::getAll('SELECT name FROM sqlite_master WHERE type="table"');
 
 		if (count($rows)==0) {
@@ -209,7 +200,7 @@ $user = R::dispense('users');
 
 			R::commit();
 			return true;
-		} catch( Exception $e ) {
+		} catch(\Exception $e) {
 			R::rollback();
 		}
 	}
@@ -226,7 +217,7 @@ $user = R::dispense('users');
 		try {
 			$id = R::store($response);
 
-			if ($query===false) {
+			if ($id===false) {
 				R::rollback();
 				return false;
 			}
@@ -235,7 +226,7 @@ $user = R::dispense('users');
 
 			R::commit();
 			return true;
-		} catch( Exception $e ) {
+		} catch(\Exception $e) {
 			R::rollback();
 		}
 
@@ -252,7 +243,7 @@ $user = R::dispense('users');
 			$surveys = R::find( 'surveys', 'owner = ? ', [ $owner ] );
 
 			return $surveys;
-		} catch(Exception $e) {
+		} catch(\Exception $e) {
 			return false;
 		}
 	}
@@ -265,10 +256,10 @@ $user = R::dispense('users');
 	 */
 	public function loadSurveysByKeyword(string $keyword): array|bool {
 		try {
-			$surveys = R::find( 'surveys', 'title LIKE ? ', [ "%$keyword%" ] );
-
+			$surveys = R::find( 'surveys', 'question LIKE ? ', [ "%$keyword%" ] );
+			var_dump($surveys);die;
 			return $surveys;
-		} catch(Exception $e) {
+		} catch(\Exception $e) {
 			return false;
 		}
 	}
@@ -305,7 +296,7 @@ $user = R::dispense('users');
 		
 		foreach($arraySurveys as $row) {
 			//Dénormaliser le sondage
-			$s = new Survey($row['title'],$row['owner']);
+			$s = new Survey($row['question'],$row['owner']);
 			$s->setId($row['id']);
 
 			//Récupérer les réponses

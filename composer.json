@@ -13,5 +13,7 @@
             "email": "ceruth@epfc.eu"
         }
     ],
-    "require": {}
+    "require": {
+        "maximebf/debugbar": "^1.19"
+    }
 }
