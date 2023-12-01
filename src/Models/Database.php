@@ -164,7 +164,7 @@ class Database {
 		}
 
 		//Mise à jour de l'utilisateur
-		$user->password = $password;
+		$user->password = password_hash($password,PASSWORD_BCRYPT);
 		R::store($user);
 		
 		return true;
@@ -181,7 +181,11 @@ class Database {
 		R::begin();
 
 		try {
-			$id = R::store( $survey );
+			$s = R::dispense('surveys');
+			$s->owner = $survey->getOwner();
+			$s->question = $survey->getQuestion();
+
+			$id = R::store( $s );
 
 			if ($id === false) {
                 R::rollback();
@@ -203,6 +207,8 @@ class Database {
 		} catch(\Exception $e) {
 			R::rollback();
 		}
+
+		return false;
 	}
 
 	/**
@@ -215,7 +221,12 @@ class Database {
 		R::begin();
 
 		try {
-			$id = R::store($response);
+			$r = R::dispense('responses');
+			$r->id_survey = $response->getSurvey()->getId();
+			$r->title = $response->getTitle();
+			$r->count = $response->getCount();
+
+			$id = R::store($r);
 
 			if ($id===false) {
 				R::rollback();
@@ -230,6 +241,7 @@ class Database {
 			R::rollback();
 		}
 
+		return false;
 	}
 
 	/**
@@ -240,8 +252,10 @@ class Database {
 	 */
 	public function loadSurveysByOwner(string $owner): array|bool {
 		try {
-			$surveys = R::find( 'surveys', 'owner = ? ', [ $owner ] );
+			$arraySurveys = R::find( 'surveys', 'owner = ? ', [ $owner ] );
 
+			//Convertir le tableau de lignes en tableau de Survey + charger les réponses
+			$surveys = $this->loadSurveys($arraySurveys);
 			return $surveys;
 		} catch(\Exception $e) {
 			return false;
@@ -302,7 +316,7 @@ class Database {
 			$s->setId($row['id']);
 
 			//Récupérer les réponses
-			$responses = R::find( 'responses', 'survey_id = ? ', [ $row['id'] ] );
+			$responses = R::find( 'responses', 'id_survey = ? ', [ $row['id'] ] );
 			$this->loadResponses($s, $responses);
 
 			$surveys[] = $s;
@@ -325,7 +339,7 @@ class Database {
 
 		foreach($arrayResponses as $row) {
 			//Dénormaliser la réponse
-			$r = new Response($row['survey_id'],$row['title'],$row['count']);
+			$r = new Response($survey,$row['title'],$row['count']);
 			$r->setId($row['id']);
 
 			$survey->addResponse($r);

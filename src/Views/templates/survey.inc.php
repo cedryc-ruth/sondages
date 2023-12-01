@@ -4,8 +4,7 @@
     <?= $survey->getQuestion() ?>
 </div>
 
-<?php var_dump($survey);die;
- foreach ($survey->getResponses() as $response) { ?>
+<?php foreach ($survey->getResponses() as $response) { ?>
     <div class="response">
         <span class="responseTitle"><?= $response->getTitle() ?></span>
         <span><progress max="100" value="<?= number_format($response->getPercentage(), 2) ?>" class="chart"></progress></span>
