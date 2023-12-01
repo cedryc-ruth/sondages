@@ -48,7 +48,7 @@ $user = R::dispense('users');
 	 *		title char(255),
 	 *		count integer);
 	 */
-	private function createDataBase() {
+	private function createDataBase(): void {
 		R::exec( 'CREATE TABLE users(nickname char(20), password char(50));' );
 		R::exec( 'CREATE TABLE surveys(id integer primary key autoincrement, 
 			owner char(20), question char(255));' );
@@ -71,7 +71,7 @@ $user = R::dispense('users');
 	 * @param string $nickname Pseudonyme à vérifier.
 	 * @return boolean True si le pseudonyme est valide, false sinon.
 	 */
-	private function checkNicknameValidity($nickname) {
+	private function checkNicknameValidity(string $nickname): bool {
 		return preg_match('/^[a-zA-Z]{3,10}$/',$nickname);
 	}
 
@@ -82,7 +82,7 @@ $user = R::dispense('users');
 	 * @param string $password Mot de passe à vérifier.
 	 * @return boolean True si le mot de passe est valide, false sinon.
 	 */
-	private function checkPasswordValidity($password) {
+	private function checkPasswordValidity(string $password): bool {
 		return preg_match('/^\S{3,10}$/',$password);
 	}
 
@@ -92,7 +92,7 @@ $user = R::dispense('users');
 	 * @param string $nickname Pseudonyme à vérifier.
 	 * @return boolean True si le pseudonyme est disponible, false sinon.
 	 */
-	private function checkNicknameAvailability($nickname) {
+	private function checkNicknameAvailability(string $nickname): bool {
 		$user = R::findOne( 'users', ' nickname=?', [ $nickname ] );	//Requête préparée
 
 		return empty($user);
@@ -105,7 +105,7 @@ $user = R::dispense('users');
 	 * @param string $password Mot de passe.
 	 * @return boolean True si le couple est correct, false sinon.
 	 */
-	public function checkPassword($nickname, $password) {
+	public function checkPassword(string $nickname, string $password): bool {
 		$user = R::findOne( 'users', ' nickname=?', [ $nickname ] );	//Requête préparée
 
 		if(!empty($user) && password_verify($password, $user->password)) {
@@ -126,7 +126,7 @@ $user = R::dispense('users');
 	 * @param string $password Mot de passe.
 	 * @return boolean|string True si le couple a été ajouté avec succès, un message d'erreur sinon.
 	 */
-	public function addUser($nickname, $password) {
+	public function addUser(string $nickname, string $password): bool|string {
 		//Validation des données utilisateur
 		if(!$this->checkNicknameValidity($nickname)) {
 			return "Le pseudo doit contenir entre 3 et 10 lettres.";
@@ -160,7 +160,7 @@ $user = R::dispense('users');
 	 * @param string $password Nouveau mot de passe.
 	 * @return boolean|string True si le mot de passe a été modifié, un message d'erreur sinon.
 	 */
-	public function updateUser($nickname, $password) {
+	public function updateUser(string $nickname, string $password): bool|string {
 		//Validation des données utilisateur
 		if(!$this->checkPasswordValidity($password)) {
 			return "Le mot de passe doit contenir entre 3 et 10 caractères.";
@@ -186,68 +186,59 @@ $user = R::dispense('users');
 	 * @param Survey $survey Sondage à sauvegarder.
 	 * @return boolean True si la sauvegarde a été réalisée avec succès, false sinon.
 	 */
-	public function saveSurvey(&$survey) {
+	public function saveSurvey(Survey &$survey): bool {
 		R::begin();
-		try{
-			R::store( $survey );
 
-			try {
+		try {
+			$id = R::store( $survey );
 
-			} catch( Exception $e ) {
-				R::rollback();
-			}
-
-			R::commit();
-		} catch( Exception $e ) {
-			R::rollback();
-		}
-		$user = R::findOne( 'users', ' nickname=?', [ $nickname ] );
-            $query = $this->connection->prepare("INSERT INTO surveys(owner,question) VALUES (?,?)");
-
-            $r = $query->execute(array($survey->getOwner(), $survey->getQuestion()));
-            if ($r === false) {
-                $this->connection->rollback();
+			if ($id === false) {
+                R::rollback();
                 return false;
             }
             
-            $id = $this->connection->lastInsertId();
             $survey->setId($id);
             $responses = $survey->getResponses();
             
             foreach ($responses as &$response) {
                 if ($this->saveResponse($response)===false) {
-                    $this->connection->rollback();
+                    R::rollback();
                     return false;
                 }
             }
-            
-            $this->connection->commit();
-            return true;
+
+			R::commit();
+			return true;
+		} catch( Exception $e ) {
+			R::rollback();
+		}
 	}
 
 	/**
 	 * Sauvegarde une réponse dans la base de donnée et met à jour son indentifiant.
 	 *
-	 * @param Survey $response Réponse à sauvegarder.
+	 * @param Response $response Réponse à sauvegarder.
 	 * @return boolean True si la sauvegarde a été réalisée avec succès, false sinon.
 	 */
-	private function saveResponse(&$response) {
-		$query = $this->connection->prepare("INSERT INTO responses(id_survey, title, count) 
-                                                    VALUES(:id_survey, :title, :count)");
-            if ($query!==false) {
-                $r = $query->execute( array(
-                            'id_survey' => $response->getSurvey()->getId(),
-                            'title' => $response->getTitle(),
-                            'count'=> $response->getCount() ));
-                
-                if($r!==false) {
-                    $id = $this->connection->lastInsertId();
-                    $response->setId($id);
+	private function saveResponse(Response &$response): bool {
+		R::begin();
 
-                    return true;
-                }
-            }
-            return false;
+		try {
+			$id = R::store($response);
+
+			if ($query===false) {
+				R::rollback();
+				return false;
+			}
+
+			$response->setId($id);
+
+			R::commit();
+			return true;
+		} catch( Exception $e ) {
+			R::rollback();
+		}
+
 	}
 
 	/**
@@ -256,11 +247,14 @@ $user = R::dispense('users');
 	 * @param string $owner Pseudonyme de l'utilisateur.
 	 * @return array(Survey)|boolean Sondages trouvés par la fonction ou false si une erreur s'est produite.
 	 */
-	public function loadSurveysByOwner($owner) {
-		$surveys = R::find( 'surveys', 'owner = ? ', [ $owner ] );
+	public function loadSurveysByOwner(string $owner): array|bool {
+		try {
+			$surveys = R::find( 'surveys', 'owner = ? ', [ $owner ] );
 
-		return $surveys;
-		//Pas de gestion d'erreur
+			return $surveys;
+		} catch(Exception $e) {
+			return false;
+		}
 	}
 
 	/**
@@ -269,11 +263,14 @@ $user = R::dispense('users');
 	 * @param string $keyword Mot clé à chercher.
 	 * @return array(Survey)|boolean Sondages trouvés par la fonction ou false si une erreur s'est produite.
 	 */
-	public function loadSurveysByKeyword($keyword) {
-		$surveys = R::find( 'surveys', 'title LIKE ? ', [ "%$keyword%" ] );
+	public function loadSurveysByKeyword(string $keyword): array|bool {
+		try {
+			$surveys = R::find( 'surveys', 'title LIKE ? ', [ "%$keyword%" ] );
 
-		return $surveys;
-		//Pas de gestion d'erreur
+			return $surveys;
+		} catch(Exception $e) {
+			return false;
+		}
 	}
 
 
@@ -283,7 +280,7 @@ $user = R::dispense('users');
 	 * @param int $id Identifiant de la réponse.
 	 * @return boolean True si le vote a été enregistré, false sinon.
 	 */
-	public function vote($id) {
+	public function vote(int $id): bool {
 		$response = R::findOne( 'responses', 'id=?', [ $id ] );
 
 		if(!empty($response)) {
@@ -303,7 +300,7 @@ $user = R::dispense('users');
 	 * @param array $arraySurveys Tableau de lignes.
 	 * @return array(Survey)|boolean Le tableau de sondages ou false si une erreur s'est produite.
 	 */
-	private function loadSurveys($arraySurveys) {
+	private function loadSurveys(array $arraySurveys): array|bool {
 		$surveys = array();
 		
 		foreach($arraySurveys as $row) {
@@ -328,7 +325,7 @@ $user = R::dispense('users');
 	 * @param array $arraySurveys Tableau de lignes.
 	 * @return array(Response)|boolean Le tableau de réponses ou false si une erreur s'est produite.
 	 */
-	private function loadResponses(&$survey, $arrayResponses) {
+	private function loadResponses(Survey &$survey, array $arrayResponses): array|bool {
 		if(count($arrayResponses)==0) {
 			return false;
 		}
