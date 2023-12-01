@@ -256,8 +256,10 @@ class Database {
 	 */
 	public function loadSurveysByKeyword(string $keyword): array|bool {
 		try {
-			$surveys = R::find( 'surveys', 'question LIKE ? ', [ "%$keyword%" ] );
-			var_dump($surveys);die;
+			$arraySurveys = R::find( 'surveys', 'question LIKE ? ', [ "%$keyword%" ] );
+			
+			//Convertir le tableau de lignes en tableau de Survey + charger les réponses
+			$surveys = $this->loadSurveys($arraySurveys);
 			return $surveys;
 		} catch(\Exception $e) {
 			return false;
@@ -296,7 +298,7 @@ class Database {
 		
 		foreach($arraySurveys as $row) {
 			//Dénormaliser le sondage
-			$s = new Survey($row['question'],$row['owner']);
+			$s = new Survey($row['owner'],$row['question']);
 			$s->setId($row['id']);
 
 			//Récupérer les réponses
@@ -329,6 +331,9 @@ class Database {
 			$survey->addResponse($r);
 			$responses[] = $r;
 		}
+
+		//Calcul des pourcentages
+		$survey->computePercentages();
 
 		return $responses;
 	}
